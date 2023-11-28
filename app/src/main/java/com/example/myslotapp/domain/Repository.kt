@@ -6,5 +6,4 @@ interface Repository {
 
     fun spinReels(game: Game): Game
 
-    fun getResult(game: Game): List<Symbol>
 }
