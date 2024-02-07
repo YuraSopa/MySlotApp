@@ -19,7 +19,7 @@
             android:exported="false" />
         <activity
             android:screenOrientation="landscape"
-            android:name=".presentation.MainActivity"
+            android:name=".presentation.WelcomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg"
-    tools:context=".presentation.MainActivity">
+    tools:context=".presentation.WelcomeActivity">
 
     <ImageView
         android:id="@+id/ivStart"
@@ -17,7 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        app:srcCompat="@drawable/btn_start" />
+        app:srcCompat="@drawable/btn_start"
+        android:contentDescription="@string/start_game" />
 
     <ImageView
         android:id="@+id/ivExit"
@@ -28,6 +29,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ivStart"
-        app:srcCompat="@drawable/btn_exit" />
+        app:srcCompat="@drawable/btn_exit"
+        android:contentDescription="@string/exit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
