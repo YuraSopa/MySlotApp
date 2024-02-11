@@ -5,46 +5,49 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.myslotapp.R
-import com.example.myslotapp.data.RepositoryImpl
 import com.example.myslotapp.databinding.ActivityGameBinding
-import com.example.myslotapp.domain.usecases.CreateGameUseCase
-import com.example.myslotapp.domain.usecases.SpinReelsUseCase
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class GameActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityGameBinding
 
-    private val repository = RepositoryImpl
-
-
-    private val createGameUseCase = CreateGameUseCase(repository)
-    private val spinReelsUseCase = SpinReelsUseCase(repository)
     private val viewModel = GameViewModel()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
         lifecycleScope.launch {
-            viewModel.credit.collect {
-                binding.tvCredit.text = String.format("$%s", it)
+            viewModel.game.collectLatest {
+                binding.tvBet.text = String.format("$%s", it.bet)
+                binding.tvCredit.text = String.format("$%s", it.credit)
+                binding.tvWin.text = String.format("$%s", it.win)
             }
         }
 
-        lifecycleScope.launch {
-            viewModel.bet.collect {
-                binding.tvBet.text = String.format("$%s", it)
+        lifecycleScope.launch{
+            viewModel.isSpinning.collect{
+                if (it){
+                    binding.ivBetOne.setImageResource(R.drawable.btn_one_disabled)
+                    binding.ivBetMax.setImageResource(R.drawable.btn_max_disabled)
+                    binding.ivSpin.setImageResource(R.drawable.btn_spin_disabled)
+                }else{
+                    binding.ivBetOne.setImageResource(R.drawable.btn_one_default)
+                    binding.ivBetMax.setImageResource(R.drawable.btn_max_default)
+                    binding.ivSpin.setImageResource(R.drawable.btn_spin_default)
+                }
             }
         }
 
+
         lifecycleScope.launch {
-            viewModel.win.collect {
-                binding.tvWin.text = String.format("$%s", it)
+            viewModel.game.collect {
+                binding.ivSlot1?.setImageResource(it.slot[0].value)
+                binding.ivSlot2?.setImageResource(it.slot[1].value)
+                binding.ivSlot3?.setImageResource(it.slot[2].value)
             }
         }
 
@@ -58,11 +61,7 @@ class GameActivity : AppCompatActivity() {
 
 
         binding.ivSpin.setOnClickListener {
-            viewModel.startSpin(
-                binding.ivSlot1!!,
-                binding.ivSlot2!!,
-                binding.ivSlot3!!,
-            )
+            viewModel.startSpin()
         }
 
         binding.ivPayTable.setOnClickListener {

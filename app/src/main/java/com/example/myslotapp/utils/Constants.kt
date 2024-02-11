@@ -5,6 +5,8 @@ import com.example.myslotapp.domain.Symbol
 
 object Constants {
 
+    const val LOADING_TIME = 2000L
+
     const val START_CREDIT = 300
 
     const val TIME_INTERVAL_BETWEEN_ITEMS = 100L
