@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.myslotapp.R
 import com.example.myslotapp.databinding.ActivityGameBinding
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class GameActivity : AppCompatActivity() {
@@ -19,19 +18,20 @@ class GameActivity : AppCompatActivity() {
 
     private val viewModel = GameViewModel()
 
-    var previousBet: Int? = null
-    var previousCredit: Int? = null
-    var previousWin: Int? = null
+    private var previousBet: Int? = null
+    private var previousCredit: Int? = null
+    private var previousWin: Int? = null
+
+    private var enoughCredits = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-
         lifecycleScope.launch {
-            viewModel.game.collectLatest {
+            viewModel.game.collect {
+
                 if (it.bet != previousBet) {
                     binding.tvBet.startAnimation(createAnimation())
                     binding.tvBet.text = String.format("$%s", it.bet)
@@ -47,7 +47,21 @@ class GameActivity : AppCompatActivity() {
                 if (it.win != previousWin) {
                     binding.tvWin.startAnimation(createAnimation())
                     binding.tvWin.text = String.format("$%s", it.win)
-                    previousWin= it.win
+                    previousWin = it.win
+                }
+            }
+        }
+
+
+        lifecycleScope.launch {
+            viewModel.enoughCredits.collect {
+                enoughCredits = it
+                if (it) {
+                    binding.ivSpin.setImageResource(R.drawable.btn_spin_default)
+                    binding.ivSpin.isClickable = true
+                } else {
+                    binding.ivSpin.setImageResource(R.drawable.btn_spin_disabled)
+                    binding.ivSpin.isClickable = false
                 }
             }
         }
@@ -55,13 +69,13 @@ class GameActivity : AppCompatActivity() {
         lifecycleScope.launch {
             viewModel.isSpinning.collect {
                 if (it) {
-                    binding.ivBetOne.setImageResource(R.drawable.btn_one_disabled)
-                    binding.ivBetMax.setImageResource(R.drawable.btn_max_disabled)
-                    binding.ivSpin.setImageResource(R.drawable.btn_spin_disabled)
+                    disabledButtons(true)
                 } else {
-                    binding.ivBetOne.setImageResource(R.drawable.btn_one_default)
-                    binding.ivBetMax.setImageResource(R.drawable.btn_max_default)
-                    binding.ivSpin.setImageResource(R.drawable.btn_spin_default)
+                    if (enoughCredits) {
+                        disabledButtons(false)
+                    } else {
+                        disabledButtons(false, disableOnlySpin = true)
+                    }
                 }
             }
         }
@@ -101,11 +115,42 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    private fun disabledButtons(isDisable: Boolean, disableOnlySpin: Boolean = false) {
+        if (isDisable) {
+            with(binding) {
+                ivBetOne.setImageResource(R.drawable.btn_one_disabled)
+                ivBetMax.setImageResource(R.drawable.btn_max_disabled)
+                ivSpin.setImageResource(R.drawable.btn_spin_disabled)
+                ivBetOne.isClickable = false
+                ivBetMax.isClickable = false
+                ivSpin.isClickable = false
+            }
+        } else {
+            with(binding) {
+                binding.ivBetOne.setImageResource(R.drawable.btn_one_default)
+                binding.ivBetMax.setImageResource(R.drawable.btn_max_default)
+                binding.ivSpin.setImageResource(R.drawable.btn_spin_default)
+                ivBetOne.isClickable = true
+                ivBetMax.isClickable = true
+                ivSpin.isClickable = true
+            }
+        }
+
+        if (disableOnlySpin) {
+            binding.ivSpin.setImageResource(R.drawable.btn_spin_disabled)
+            binding.ivSpin.isClickable = false
+        }
+
+    }
+
     private fun clickAnimation(imageView: ImageView, resIdPressed: Int, resIdDefault: Int) {
         lifecycleScope.launch {
-            imageView.setImageResource(resIdPressed)
-            delay(200)
-            imageView.setImageResource(resIdDefault)
+            if (imageView.isClickable) {
+                imageView.setImageResource(resIdPressed)
+                delay(200)
+                imageView.setImageResource(resIdDefault)
+            }
+
         }
     }
 

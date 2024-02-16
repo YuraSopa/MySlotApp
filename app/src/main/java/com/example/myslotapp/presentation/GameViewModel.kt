@@ -27,7 +27,13 @@ class GameViewModel : ViewModel() {
     val game: StateFlow<Game>
         get() = _game
 
+    private var _enoughCredits = MutableStateFlow(true)
+    val enoughCredits: StateFlow<Boolean>
+        get() = _enoughCredits
 
+    private fun checkEnoughCredits() {
+        _enoughCredits.value = game.value.credit - game.value.bet >= 0
+    }
 
     fun changeBet() {
         _game.value = when (_game.value.bet) {
@@ -36,15 +42,17 @@ class GameViewModel : ViewModel() {
             Bet.BET_30.betValue -> _game.value.copy(bet = Bet.BET_10.betValue)
             else -> Game.DEFAULT_GAME
         }
+        checkEnoughCredits()
     }
 
     fun setMaxBet() {
         _game.value = _game.value.copy(bet = Bet.BET_30.betValue)
+        checkEnoughCredits()
     }
 
 
     fun startSpin() {
-        if (!isSpinning.value) {
+        if (!isSpinning.value && enoughCredits.value) {
             _isSpinning.value = true
             _game.value.credit -= _game.value.bet
             CoroutineScope(Dispatchers.Main).launch {
@@ -66,6 +74,7 @@ class GameViewModel : ViewModel() {
 
 
     private fun stopSpin() {
+        checkEnoughCredits()
         val result1 = game.value.slot[0]
         val result2 = game.value.slot[1]
         val result3 = game.value.slot[2]
