@@ -10,15 +10,15 @@ object Constants {
     const val START_CREDIT = 300
 
     const val TIME_INTERVAL_BETWEEN_ITEMS = 100L
-    const val TIME_ANIMATION = 1500L
+    const val TIME_ANIMATION_SPIN = 1500L
 
     val symbols = listOf(
-        Symbol(value = R.drawable.item0, weight = 2),
+        Symbol(value = R.drawable.item0, weight = 1),
         Symbol(value = R.drawable.item1, weight = 2),
         Symbol(value = R.drawable.item2, weight = 3),
-        Symbol(value = R.drawable.item3, weight = 3),
+        Symbol(value = R.drawable.item3, weight = 4),
         Symbol(value = R.drawable.item4, weight = 7),
         Symbol(value = R.drawable.item5, weight = 7),
-        Symbol(value = R.drawable.item6, weight = 20)
+        Symbol(value = R.drawable.item6, weight = 10)
     )
 }

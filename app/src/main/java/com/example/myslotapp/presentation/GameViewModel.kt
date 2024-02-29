@@ -65,7 +65,7 @@ class GameViewModel : ViewModel() {
 
     private suspend fun spinReels() {
         val startTime = System.currentTimeMillis()
-        while (System.currentTimeMillis() - startTime < Constants.TIME_ANIMATION) {
+        while (System.currentTimeMillis() - startTime < Constants.TIME_ANIMATION_SPIN) {
             updateImages()
             delay(Constants.TIME_INTERVAL_BETWEEN_ITEMS)
         }
